@@ -1,0 +1,269 @@
+#!/bin/bash
+
+OPTS="mhvq"
+OPTSINHELPER=yes
+export PATH=$PATH:$(dirname $0)
+. $(which wp-helpers) || exit 1
+shift $(($OPTPROCESSED - 1))
+
+currentversion=$(wpgetversion $PWD | sed -E "s/(\.x)?(-dev.*)?//")
+
+case $1 in
+  minor)
+  shift && level=minor && log "force minor increment"
+  ;;
+
+  major)
+  shift && level=major && log "force major increment"
+  ;;
+
+  norelease|unreleased)
+  shift && increment=false && log "no release nr change"
+  ;;
+
+  # dev)
+  # dev=$1 && shift && increment=false && log "$dev=dev, no version nr change"
+  # build=.$(($(git log --pretty=oneline | wc -l) + 1))
+  # ;;
+
+  dev|alpha|beta|rc)
+  dev=$1
+  shift
+  build=.$(($(git log --pretty=oneline | wc -l) + 1))
+  if echo $currentversion | egrep -q "\-(dev|alpha|beta|rc)(\.[0-9]+)?$"
+  then
+    increment=false
+    log "$dev no version nr change as already $dev, adding build $build"
+  else
+    # level=minor
+    log "new $dev pre-release, increment $level version and add build $build"
+  fi
+  ;;
+
+  *)
+  log "patch $1"
+esac
+
+currentversionfull=$(wpgetversion $PWD)
+log currentversionfull $currentversion
+currentversion=$(wpgetversion $PWD | sed -E "s/(\.x)?(-(dev|alpha|beta|rc)(\.[0-9]+)?)?$//")
+log currentversion $currentversion
+
+cd $(git rev-parse --show-toplevel) || end $? "Could not find git top-level directory"
+plugin_name=$(wpgetname $PWD | sed "s/ *(dev) *$//")
+[ "$dev" ] && plugin_name="$plugin_name (dev)"
+plugin_desc=$(wpgetdesc $PWD)
+
+log currentversion $currentversion
+
+log current  $plugin_name $currentversion
+lastrelease=$(git log --pretty=oneline | cut -d  " " -f 2 | egrep -v "\-(dev|alpha|beta|rc)" | grep -E "(v|)[0-9]+\.[0-9]+" | head -1 | sed "s/^v//")
+[ "$lastrelease" = "" ] && lastrelease=0.0
+log lastrelease $lastrelease
+log compare_versions $lastrelease $currentversion
+compare_versions $lastrelease $currentversion >/dev/null
+[ $? -eq 1 ] && currentversion=$lastrelease
+
+git log | grep -B10000 "^[[:blank:]]*v$lastrelease *$"  | egrep -v "^[[:blank:]]*v$lastrelease *$" \
+| egrep "^[[:blank:]]*\*" | sed "s/^[[:blank:]]*//" \
+> $TMP.history
+
+grep -E "\* +new" $TMP.history && [ "$level" != "major" ] && level=minor && log "minor increment"
+pluginfile=$(
+pwd | grep -q "/plugins/" && grep -l "^[[:blank:]\*;]*Plugin Name:" *.php  2>/dev/null  \
+|| ( pwd | grep -q "/themes/" && grep -l "^[[:blank:]\*;]*Theme Name:" style.css 2>/dev/null )
+) || end $? "could not find plugin/theme file"
+log plugin file $pluginfile
+git diff --color $pluginfile | grep . && end 1 "Commit or discard changes to $pluginfile first"
+
+[ -f readme.txt ] || end $? no readme.txt
+
+if [ "$increment" = "false" ]
+then
+  next=$currentversion
+  nextlog=Unreleased
+elif [ "$dev" ]
+then
+  next=$(increment_version $level "$currentversion.0")
+else
+  echo $currentversionfull | egrep -q "\-(dev|alpha|beta|rc|build)" \
+  && next=$currentversion \
+  || next=$(increment_version $level "$lastrelease.0")
+fi
+if [ "$dev" ]
+then
+  next="$next-$dev$build"
+  nextlog="Unreleased"
+else
+  nextlog=$next
+fi
+
+url() {
+  echo "$@" | urlcoder -e | sed "s/+/%20/g"
+}
+
+wp_min=$(grep "Requires at least:" readme.txt | sed "s/.*: *//" | head -1)
+wp_version=$(wp core version)
+# wp_badge="$wp_min-$wp_version"
+wp_badge="$wp_min - $wp_version"
+php_min=$(minphp || grep -h "Requires PHP:" *.php readme.txt | sed "s/.*: *//" | head -1)
+stable=$(grep "Stable tag:" readme.txt | sed "s/.*: *//" | head -1)
+license=$(grep "License:" readme.txt | sed "s/.*: *//" | head -1)
+# echo $license_url; exit
+[ "$stable" ] && echo "![Stable $stable](https://badgen.net/badge/Stable/$(url $stable)/00aa00)" >> $TMP.badges
+[ "$wp_min" ] \
+&& echo "![WordPress $wp_badge](https://badgen.net/badge/WordPress/$(url $wp_badge)/3858e9)" >> $TMP.badges
+[ "$php_min" ] && echo "![Requires PHP $php_min](https://badgen.net/badge/PHP/$(url $php_min)/7884bf)" >> $TMP.badges
+echo [ "$license" ] | grep -qi 'agpl' && lcolor=552b55 || lcolor=aa0000
+[ "$license" ] && echo "![License $license](https://badgen.net/badge/License/$(url $license)/$lcolor)" >> $TMP.badges
+
+grep -B99999 "== Changelog ==" readme.txt | sed "s/^===.*/=== $plugin_name ===/" >> $TMP.readme
+grep -A99999 "== Changelog ==" readme.txt | tail +2 | egrep -v "= Unreleased " | grep -A99999 '^= '  > $TMP.changelog
+
+echo readme.txt
+(
+echo
+if [ "$dev" ]
+then
+  echo "= Unreleased ($next) ="
+else
+  echo "= $next ="
+fi
+# echo "= $nextlog ="
+grep "^* new" $TMP.history
+grep "^* add" $TMP.history
+grep "^* updat" $TMP.history
+grep "^* fix" $TMP.history
+grep -E -v "^* (new|add|updat|fix)" $TMP.history
+echo
+) > $TMP.unfiltered
+cat $TMP.unfiltered | while read line
+do
+  grep -q "^$line$" $TMP.release 2>/dev/null && continue
+  echo "$line" >> $TMP.release
+done
+echo >> $TMP.release
+cat $TMP.release >> $TMP.readme
+cat $TMP.changelog >> $TMP.readme
+echo "$nextlog" | grep -q "Unreleased" || sed -i -E "s/^[[:blank:]]*Stable tag *:.*/Stable tag: $next/" $TMP.readme
+[ "$wp_version" != "" ] && sed -i -E "s/^[[:blank:]]*Tested up to *:.*/Tested up to: $wp_version/" $TMP.readme
+[ "$php_min" != "" ] && sed -i -E "s/^[[:blank:]]*Requires PHP *:.*/Requires PHP: $php_min/" $TMP.readme
+
+diff readme.txt $TMP.readme
+
+echo README.md
+(
+echo "=== $plugin_name ==="
+echo
+cat $TMP.badges
+# grep -B999 "== Description ==" $TMP.readme | grep "[A-Z].*:" \
+# | egrep -v "- (Requires|Tested|Stable|Tags|License).*:" \
+# | sed -E "s/([^:]*)[[:blank:]]*:[[:blank:]]*(.*)[[:blank:]]*/* \\1: \\2  /"
+echo
+echo $plugin_desc
+echo
+grep -A999 "== Description ==" $TMP.readme
+) | sed -e "s/^=== */# /" -e "s/^== */## /"   -e "s/^= */### /" -e "s/ *=* *$//" -e "s/^\([[:blank:]]*\)\* */\\1- /"\
+> $TMP.README.md && diff README.md $TMP.README.md
+
+# cat $TMP.readme | sed -e "s/^=== */# /"   -e "s/^== */## /"   -e "s/^= */### /"   -e "s/ *=* *$//" \
+# -e "s/^[ \*]*Contributors *:/* Contributors:/" \
+# -e "s/^[ \*]*Donate link *:/* Donate link:/" \
+# -e "s/^[ \*]*Tags *:/* Tags:/" \
+# -e "s/^[ \*]*Requires at least *:/* Requires at least:/" \
+# -e "s/^[ \*]*Tested up to *:/* Tested up to:/" \
+# -e "s/^[ \*]*Requires PHP *:/* Requires PHP:/" \
+# -e "s/^[ \*]*Stable tag *:/* Stable tag:/" \
+# -e "s/^[ \*]*License *:/* License:/" \
+# -e "s/^[ \*]*License URI *:/* License URI:/" \
+# > $TMP.README.md && diff README.md $TMP.README.md
+
+if [ "$increment" = "false" ]
+then
+  echo "changelog and readme update" > $TMP.commit
+  if [ "$dev" ]
+  then
+    echo "v$next" | sed -E "s/(-[a-z]+)(\.([0-9]+))?/\\1 build \\3/" > $TMP.commit
+    [ "$dev" = "dev" ] && time=" . time() "
+    currentversion="$currentversion-$dev$build"
+    dev=" ($dev$build)"
+  else
+    dev=""
+  fi
+  [ "$dev" = "dev" ] && time=" . time() "
+
+  # [ "$dev" !] && [ "$dev" != "dev" ] && echo "$next release" >> $TMP.commit \
+
+  # define( 'WPPUL_VERSION', '1.0.4' );
+  sed -E -e "s/define[[:blank:]]*\(.*'(.*_VERSION)',[[:blank:]]*'.* *\);/define( '\\1', '$currentversion'$time );/" \
+  -e "s/^([[:blank:]\*;]*Version[[:blank:]]*:[[:blank:]]*).*/\\1$currentversion/" \
+  -e "s/^([[:blank:]\*;]*Plugin Name *:[[:blank:]]*).*/\\1$plugin_name/" \
+  $pluginfile \
+  > $TMP.pluginfile
+  diff $pluginfile $TMP.pluginfile
+  echo Commit
+  [ "$dev" ]
+
+else
+  if [ ! "$dev" ]
+  then
+    sed -E -e "s/^[[:blank:]]*Stable tag *:.*/Stable tag: $next/" $TMP.readme
+    sed -E -e "s/^[[:blank:]]*Stable tag *:.*/Stable tag: $next/" $TMP.readme
+  fi
+  sed -E -e "s/(define *\(.*_VERSION', *')[^\)]*\);/\\1$next');/" \
+  -e "s/^([[:blank:]\*;]*Version *:[[:blank:]]+).*/\\1$next/" \
+  -e "s/^([[:blank:]\*;]*Plugin Name *:[[:blank:]]*).*/\\1$plugin_name/" \
+  $pluginfile \
+  > $TMP.pluginfile && diff $pluginfile $TMP.pluginfile
+  echo Commit
+  echo "v$next" | sed -E "s/(-[a-z]+)(\.([0-9]+))/\\1 build \\3/" > $TMP.commit
+  cat $TMP.history >>$TMP.commit
+fi
+cat $TMP.commit
+
+yesno "Apply changes and commit new release $next?" || end
+
+cat $TMP.readme > readme.txt
+needle="^##[[:blank:]]"
+csplit -q -f "$TMP.split-" $TMP.README.md "/$needle/" '{*}'
+if ls $TMP.split-*
+then
+  # log "using splits"
+  for split in $TMP.split-*
+  do
+    splithead=$(grep "$needle" $split | head -1)
+    # log "$split: $splithead"
+    for section in Installation Changelog
+    do
+      sectionfile=$(echo $section | tr [:lower:] [:upper:]).md
+      echo "$splithead" | grep -q "$needle$section" \
+      && log "$section found, copying to $sectionfile" \
+      && cp $split $sectionfile \
+      && git add $sectionfile \
+      && rm $split
+    done
+    # head -1 $split | grep -q "$needle Changelog$" && tail +2 $split > CHANGELOG.md && rm $split && continue
+  done
+  ls $TMP.split-*
+  cat $TMP.split* > README.md
+else
+  log "no section found, copy as is"
+  cp $TMP.README.md README.md
+fi
+cat $TMP.pluginfile > $pluginfile
+
+[ -f .distignore ] || touch .distignore
+grep -q .gitattributes .distignore || echo .gitattributes >> .distignore
+(
+echo "# .gitattributes built automatically from .distignore, do not modify"
+cat .distignore  | sed "s/$/ export-ignore/"
+) > .gitattributes
+
+# git add readme.txt README.md .gitattributes .distignore $pluginfile INSTALLATION.md CHANGELOG.md
+git status
+# end DEBUG
+cat $TMP.commit | git commit -F - readme.txt README.md .gitattributes .distignore $pluginfile INSTALLATION.md CHANGELOG.md
+
+git log --name-status HEAD^..HEAD
+# or git log -1
+# or git log -n 1

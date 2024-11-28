@@ -1,7 +1,7 @@
 {
   "name": "documents-from-git",
   "description": "Render and cache various document formats in any post or page directly from a remote Git repository.",
-  "version": "2.2.0-beta",
+  "version": "2.2.0",
   "main": "index.js",
   "repository": {
     "type": "git",

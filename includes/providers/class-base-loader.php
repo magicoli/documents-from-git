@@ -342,10 +342,14 @@ abstract class BaseLoader {
 		$provider  = strtolower( static::$PROVIDER );
 		$page_opts = get_option( 'settings_markdowngit', array() );
 
-		$this->user      = ( $user === '' ) ? ( $page_opts[ $provider . '_user' ] ) : ( $user );
-		$this->token     = ( $token === '' ) ? ( $page_opts[ $provider . '_secret' ] ) : ( $token );
-		$this->limit     = ( $limit === '' ) ? ( $page_opts['limit'] ) : ( $limit );
-		$this->cache_ttl = ( $cache_ttl === '' ) ? ( $page_opts['cache_ttl'] ) : ( $cache_ttl );
+		$page_opts_user = empty($page_opts[ $provider . '_user' ]) ? $user : $page_opts[ $provider . '_user' ];
+		$page_opts_secret = empty($page_opts[ $provider . '_secret' ]) ? $token : $page_opts[ $provider . '_secret' ];
+		$page_opts_limit = empty($page_opts['limit']) ? $limit : $page_opts['limit'];
+		$page_opts_cache_ttl = empty($page_opts['cache_ttl']) ? $cache_ttl : $page_opts['cache_ttl'];
+		$this->user      = empty($user) ? $page_opts_user : $user;
+		$this->token     = empty($token) ? $page_opts_secret : $token;
+		$this->limit     = empty($limit ) ? $page_opts_limit : $limit;
+		$this->cache_ttl = empty($cache_ttl) ? $page_opts_cache_ttl : $cache_ttl;
 		// TODO: eventually this will be dynamic to support dynamic cache
 		$this->cache_strategy = 'static';
 
