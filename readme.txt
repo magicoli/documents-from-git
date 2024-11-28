@@ -4,7 +4,7 @@ Donate link: http://magiiic.com/support/documents-from-git
 Tags: markdown,jupyter,notebook,github,bitbucket,gitlab,vcs
 Requires at least: 5.0.0
 Tested up to: 6.7.1
-Requires PHP: 7.0
+Requires PHP: 5.7
 Stable tag: 2.2.0
 License: AGPL-3.0-or-later
 License URI: https://www.gnu.org/licenses/agpl-3.0.html
