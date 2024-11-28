@@ -1,56 +1,69 @@
-# Documents from Git - Oli's version
+=== Documents from Git - Oli's version ===
+Contributors: magicoli69,nilsnolde,danilopinotti
+Donate link: http://magiiic.com/support/documents-from-git
+Tags: markdown,jupyter,notebook,github,bitbucket,gitlab,vcs
+Requires at least: 5.0.0
+Tested up to: 6.7.1
+Requires PHP: 7.0
+Stable tag: 2.2.0
+License: AGPL-3.0-or-later
+License URI: https://www.gnu.org/licenses/agpl-3.0.html
+
+Render and cache various document formats in any post or page directly from a remote Git repository.
+
+== Description ==
 
 This WordPress Plugin lets you easily publish, collaborate on and version control your \[**Markdown, Jupyter notebook**\] documents directly from your favorite remote Git platform, **even if it's self-hosted**.
 
 The advantages are:
 
-- Write documents in your favorite editor and just push to your remote repository to update your blog instantly
-- Use the power of version control: publish different versions of the document in different posts, i.e. from another branch or commit than latest `master`
-- Easy to update by your readers via pull requests, minimizing the chance of stale tutorials
+* Write documents in your favorite editor and just push to your remote repository to update your blog instantly
+* Use the power of version control: publish different versions of the document in different posts, i.e. from another branch or commit than latest `master`
+* Easy to update by your readers via pull requests, minimizing the chance of stale tutorials
 
 The following document types are currently supported:
 
-- Markdown
-- Jupyter notebooks (**only for public repositories**)
+* Markdown
+* Jupyter notebooks (**only for public repositories**)
 
 The following platforms are currently supported:
 
-- Github
-- Bitbucket
-- Gitlab
+* Github
+* Bitbucket
+* Gitlab
 
-## Usage
+== Usage ==
 
 **Note**, this plugin uses Github's wonderful [`/markdown` API](https://developer.github.com/v3/markdown/) to render to HTML. This comes with 2 caveats:
 
 1. Unless authenticated, the rate limit is set at 60 requests per minute. Since v1.1.0 the plugin is capable of statically [caching content](#caching). In case that's not dynamic enough for you, your only option currently is to not use any cache in which case every document will be pulled from your provider every time someone opens it on your site. Then it's **strongly recommended** to create a Github access token and register it with the plugin. Then the rate limit will be set to 5000 requests per hour. See [Global attributes section](#global-attributes) for details on how to do that.
 2. The Markdown content cannot exceed 400 KB, so roughly 400 000 characters incl whitespace. If not a monographic dissertation, this should not be an applicable limit though.
 
-### Configuration
+= Configuration =
 
 In the main menu _Settings_ > _Documents from Git_ you can set all important global settings.
 
 **Note**: previous `config.json` is **deprecated** now due to security concerns.
 
-## Shortcodes
+== Shortcodes ==
 
 The features of the plugin are provided through shortcodes. You can use them in your posts, pages or custom post types.
 
-### Publish documents
+= Publish documents =
 
 `[git-<platform>-<action>]` The document-specific shortcode
 
-- `<platform>` can be one of
+* `<platform>` can be one of
     - `github`: if you use Github as your VCS platform
     - `bitbucket`: if you use Bitbucket as your VCS platform
     - `gitlab`: if you use Gitlab as your VCS platform
-- `<action>` can be one of
+* `<action>` can be one of
     - `markdown`: Render your Markdown files hosted on your VCS platform in Github's rendering style
     - `jupyter`: Render your Jupyter notebook hosted on your VCS platform (**only for public repositories**)
     - `checkout`: Renders a small badge-like box with a link to the document and the date of the last commit
     - `history`:  Renders a `<h2>` section with the last commit dates, messages and authors
 
-### Manipulate rendering style
+= Manipulate rendering style =
 
 `[git-add-css]` adds a `<div id="git-add-css" class="<classes_attribute>"` to wrap content. That way you can manipulate the style freely with additional CSS classes. Follow these steps:
 
@@ -66,7 +79,7 @@ The features of the plugin are provided through shortcodes. You can use them in 
 [/git-add-css]
 ```
 
-### Attributes
+= Attributes =
 
 Each shortcode takes a few attributes, indicating if it's required for public or private repositories:
 
@@ -106,7 +119,7 @@ Each shortcode takes a few attributes, indicating if it's required for public or
     - Public repo: :ballot_box_with_check:
     - Private repo: :ballot_box_with_check:
 
-## Caching
+== Caching ==
 
 Often we need to prioritize speed when loading content and, in addition, it is very costly to fetch, load and format the content every time we need to read the content of the post.
 
@@ -124,7 +137,7 @@ This plugin soon offers 2 methods for caching, `static` and `dynamic` which can 
 
     **This is not implemented yet**. See [#20](https://github.com/gis-ops/wordpress-markdown-git/issues/20) for details.
 
-## `Token` authorization
+== `Token` authorization ==
 
 You **need to** authorize via `user` and `token` if you intend to publish from a private repository. You **don't need to** authorize if the repository is open.
 
@@ -132,13 +145,13 @@ However, keep in mind that some platforms have stricter API limits for anonymous
 
 How to generate the `token` depends on your platform:
 
-- Github: Generate a Personal Access Token following [these instructions](https://help.github.com/en/github/authenticating-to-github/creating-a-personal-access-token-for-the-command-line)
-- Bitbucket: Generate a App Password following [these instructions](https://confluence.atlassian.com/bitbucket/app-passwords-828781300.html#Apppasswords-Createanapppassword)
-- Gitlab: Generate a Personal Access Token following [these instructions](https://docs.gitlab.com/ee/user/profile/personal_access_tokens.html#creating-a-personal-access-token)
+* Github: Generate a Personal Access Token following [these instructions](https://help.github.com/en/github/authenticating-to-github/creating-a-personal-access-token-for-the-command-line)
+* Bitbucket: Generate a App Password following [these instructions](https://confluence.atlassian.com/bitbucket/app-passwords-828781300.html#Apppasswords-Createanapppassword)
+* Gitlab: Generate a Personal Access Token following [these instructions](https://docs.gitlab.com/ee/user/profile/personal_access_tokens.html#creating-a-personal-access-token)
 
 This plugin needs only **Read access** to your repositories. Keep that in mind when creating an access token.
 
-## Examples
+== Examples ==
 
 We publish our own tutorials with this plugin: https://gis-ops.com/tutorials/.
 
@@ -203,9 +216,9 @@ We publish our own tutorials with this plugin: https://gis-ops.com/tutorials/.
     }
     ```
 
-## Installation
+== Installation ==
 
-### WordPress.org
+= WordPress.org =
 
 The latest version is on Oli's **GitHub repository**
 
@@ -215,11 +228,11 @@ There is no automatic update process from GitHub. You need to download the lates
 
 **Note**: The release from the original author on WordPress plugin store is deprecated and does not receive updates [Documents from Git](https://wordpress.org/plugins/documents-from-git/).
 
-## Troubleshooting
+== Troubleshooting ==
 
 For troubleshooting and frequently asked questions, please refer to the [FAQ](FAQ.md) page.
 
-## Acknowledgements
+== Acknowledgements ==
 
 Contributions from other projects
 
@@ -236,3 +249,64 @@ Contributions from other projects
 
 [![PDC](https://www.pdc.org/wp-content/uploads/2019/05/PDCLogo-Optimized.png)](https://www.pdc.org)
 Sponsored the Bitbucket integration.
+
+
+== Frequently Asked Questions ==
+
+= Does the plugin offer a UI =
+
+Yes, since v2.0.0 the plugin has a subpage in the main Settings menu.
+
+= Does the plugin support caching? =
+
+Yes, since v1.1.0 the plugin supports static caching of all relevant information. See the ["Caching" section](https://github.com/gis-ops/wordpress-markdown-git#caching) for details.
+
+= Are relative links supported? =
+
+No, relative image links (e.g. `![img](./img.png)`) cannot be processed by this plugin. Please see the notes in the [documentation](https://github.com/gis-ops/wordpress-markdown-git#images) for ways to work around this limitation.
+
+= Can I host the source file in a private repository? =
+
+Yes, you can, if you provide the plugin's `config.json` with the necessary credentials for your platform (see [documentation](https://github.com/gis-ops/wordpress-markdown-git#global-attributes) for details). However, be aware that all image URLs you are referencing are openly accessible or provide the necessary authentication means. Also see [#13](https://github.com/gis-ops/wordpress-markdown-git/issues/13#issuecomment-638965192) and the [documentation](https://github.com/gis-ops/wordpress-markdown-git#images) for further details.
+
+= Images =
+
+Images cannot (yet) be referenced with a relative link, i.e. `[some_image](./some_image.jpg)` won't work, as WordPress will try to access the image relative to your WordPress installation, e.g. `https://myblog.com/some_image.jpg`. See [#15](https://github.com/gis-ops/wordpress-markdown-git/issues/15) for a discussion on the topic.
+
+The solution is to either
+1. upload the image to WordPress and use the provided link
+2. push the Markdown file to the cloud, view the file in the browser and copy the provider-generated image address
+3. put the images in a repository folder and reference absolute links to your repository's raw files
+
+**Note**, the last two options might be more involved when the image (alongside the Markdown file) is hosted in a private repository. Either the provider provides a token-authenticated URL for hosted images which you can use (see. e.g. [#13](https://github.com/gis-ops/wordpress-markdown-git/issues/13#issuecomment-638965192) for Bitbucket). Or publish the image(s) in a separate **public** repository. Or use option 1.
+
+It's generally recommended to publish (and version) images alongside their Markdown document in Git.
+
+= API rate limit exceeded =
+
+If you encounter this message instead of seeing your rendered Markdown file, you most likely have forgotten to provide your Github username and access token in the `config.json`. See [Global attributes](#global-attributes) for a How-To and [Usage](#usage) for more information why this is necessary.
+
+
+== Changelog ==
+
+= v2.2.0 =
+* Plugin didn't authenticate correctly to GitHub
+
+= v2.1.0 =
+* Styles were not enqueued properly which led to default markdown rendering
+
+= v2.0.0 =
+* Created Settings subpage for the plugin (BREAKING CHANGE)
+
+= v1.1.1 =
+* Fix GitLab URLs for subdirectory markdown paths
+
+= v1.1.0 =
+* Implement static caching
+
+= v1.0.2 =
+* Fixed rate limiting for unauthenticated `/markdown` requests
+* Fixed Jupyter implementation
+
+= v1.0.0 =
+* First version

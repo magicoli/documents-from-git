@@ -1,0 +1,28 @@
+{
+  "name": "documents-from-git",
+  "description": "Render and cache various document formats in any post or page directly from a remote Git repository.",
+  "version": "2.2.0-beta",
+  "main": "index.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/magicoli/documents-from-git"
+  },
+  "author": "Olivier van Helden",
+  "license": "AGPL-3.0-or-later",
+  "scripts": {
+    "start": "grunt default",
+    "readme": "grunt readme",
+    "i18n": "grunt i18n"
+  },
+  "devDependencies": {
+    "grunt": "^1.6.1",
+    "grunt-contrib-concat": "^2.1.0",
+    "grunt-text-replace": "^0.4.0",
+    "grunt-wp-i18n": "^1.0.3",
+    "grunt-wp-readme-to-markdown": "^2.1.0"
+  },
+  "dependencies": {
+    "grunt-contrib-clean": "^2.0.1",
+    "grunt-contrib-copy": "^1.0.0"
+  }
+}

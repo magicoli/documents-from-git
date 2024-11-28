@@ -1,14 +1,17 @@
 <?php
 /**
  * Plugin Name: Documents from Git
- * Plugin URI: https://github.com/gis-ops/wordpress-markdown-git
- * Description: Render and cache various document formats in any post or page directly from a remote Git repository of your favorite platform via shortcodes. Currently supported: Markdown, Jupyter Notebooks.
- * Version:     2.2.0
- * Author:      GIS-OPS UG
- * Author URI:  https://gis-ops.com
- * Text Domain: documents-git
- * License: GPLv3
+ * Plugin URI: https://github.com/magicoli/documents-from-git
+ * Description: Render and cache various document formats in any post or page directly from a remote Git repository.
+ * Version: 2.2.0-beta
+ * Author: Olivier van Helden
+ * Author URI: https://magiiic.com/
+ * Text Domain: documents-from-git
+ * Domain Path: /languages
+ * License: AGPL-3.0-or-later
+ * License URI: https://www.gnu.org/licenses/agpl-3.0.html
  *
+ * @package     documents-from-git
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -65,7 +68,7 @@ $pages = array(
         'sections' => array(
             'git_general' => array(
                 'title' => __( 'General Settings', 'documents-from-git' ),
-                'text' => __( 'Find the official documentation on <a href="https://github.com/gis-ops/wordpress-markdown-git" target="_blank">Github</a>. Contact us on <a href="mailto:enquiry@gis-ops.com">enquiry@gis-ops.com</a>.', 'documents-from-git' ),
+                'text' => __( 'Find the official documentation on <a href="https://github.com/magicoli/documents-from-git" target="_blank">Github</a>. Contact us on <a href="mailto:enquiry@gis-ops.com">enquiry@gis-ops.com</a>.', 'documents-from-git' ),
                 'fields' => array(
                     'limit' => array(
                         'title' => __( 'History Limit', 'documents-from-git' ),
@@ -80,14 +83,14 @@ $pages = array(
                     'classes' => array(
                         'title' => __( 'CSS classes', 'documents-from-git' ),
                         'id' => 'classes',
-                        'text' => __( 'Set (optional) CSS class names which can be wrapped with the <code>git-add-css</code> shortcode, see the <a href="https://github.com/gis-ops/wordpress-markdown-git#use-additional-css-classes-to-style" target="_blank">documentation</a> for usage examples.', 'documents-from-git' ),
+                        'text' => __( 'Set (optional) CSS class names which can be wrapped with the <code>git-add-css</code> shortcode, see the <a href="https://github.com/magicoli/documents-from-git#use-additional-css-classes-to-style" target="_blank">documentation</a> for usage examples.', 'documents-from-git' ),
                         'placeholder' => 'my-css-class'
                     ),
                     'cache_ttl' => array(
                         'title' => __( 'Cache TTL', 'documents-from-git' ),
                         'id' => 'cache_ttl',
                         'type' => 'number',
-                        'text' => __( 'The Time To Live (TTL) for cached documents, <b>in seconds</b>. Defaults to 1 week. To manually flush the case, see the <a href="https://github.com/gis-ops/wordpress-markdown-git#static-caching-cache_strategystatic" target="_blank">documentation</a>.', 'documents-from-git' ),
+                        'text' => __( 'The Time To Live (TTL) for cached documents, <b>in seconds</b>. Defaults to 1 week. To manually flush the case, see the <a href="https://github.com/magicoli/documents-from-git#static-caching-cache_strategystatic" target="_blank">documentation</a>.', 'documents-from-git' ),
                         'value' => 604800,
                         'attributes' => array(
                             'required' => true
