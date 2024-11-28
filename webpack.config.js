@@ -1,27 +1,32 @@
-const defaultConfig = require( "@wordpress/scripts/config/webpack.config" );
-const path          = require( 'path' );
-const CopyPlugin    = require( "copy-webpack-plugin" );
+const defaultConfig = require("@wordpress/scripts/config/webpack.config");
+const path = require('path');
+const CopyPlugin = require("copy-webpack-plugin");
 
 // Configuration object.
 const config = {
 	...defaultConfig,
 	entry: {
-		// '../includes/admin/admin': './src/admin/index.js',
+        // As in w4os...
+        // '../includes/admin/admin': './src/admin/index.js',
 		// '../includes/admin/settings-models': './src/admin/models.js',
-		// '../includes/public/public': './src/public/index.js',
-		// '../blocks/avatar-profile/avatar-profile': './src/blocks/avatar-profile/index.js',
-		// '../blocks/grid-info/grid-info': './src/blocks/grid-info/index.js',
-		// '../blocks/grid-status/grid-status': './src/blocks/grid-status/index.js',
-		// '../blocks/popular-places/popular-places': './src/blocks/popular-places/index.js',
-		// '../blocks/web-search/web-search': './src/blocks/web-search/index.js',
-		// '../blocks/events/index': './src/blocks/events/index.js',
+
+        // Copilot suggestion
+		// 'admin': './src/admin/index.js',
+		// 'settings-models': './src/admin/models.js',
 	},
 	output: {
 		filename: '[name].js',
 		// Specify the path to the JS files.
-		path: path.resolve( __dirname, 'build' ),
+		path: path.resolve(__dirname, 'build'),
 	},
-}
+	plugins: [
+		new CopyPlugin({
+			patterns: [
+				{ from: 'src/**/*.css', to: '[name].css' },
+			],
+		}),
+	],
+};
 
 // Export the config object.
 module.exports = config;

@@ -1,5 +1,12 @@
 # Documents from Git - Oli's version
 
+![Release](https://img.shields.io/github/v/release/magicoli/documents-from-git)
+![Current 2.3.0-dev](https://badgen.net/badge/current/2.3.0-dev/00aa00)
+![License](https://img.shields.io/github/license/magicoli/documents-from-git)
+![Last Commit](https://img.shields.io/github/last-commit/magicoli/documents-from-git)
+![WordPress 5.0.0 - 6.7.1](https://badgen.net/badge/WordPress/5.0.0%20-%206.7.1/3858e9)
+![Requires PHP 5.7-](https://badgen.net/badge/PHP/5.7/7884bf)
+
 This WordPress Plugin lets you easily publish, collaborate on and version control your \[**Markdown, Jupyter notebook**\] documents directly from your favorite remote Git platform, **even if it's self-hosted**.
 
 The advantages are:

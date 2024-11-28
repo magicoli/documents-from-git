@@ -1,9 +1,9 @@
 <?php
 /**
- * Plugin Name: Documents from Git
+ * Plugin Name: Documents from Git (dev)
  * Plugin URI: https://github.com/magicoli/documents-from-git
  * Description: Render and cache various document formats in any post or page directly from a remote Git repository.
- * Version: 2.2.0
+ * Version: 2.3.0-dev.74
  * Author: Olivier van Helden
  * Author URI: https://magiiic.com/
  * Text Domain: documents-from-git

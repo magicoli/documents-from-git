@@ -3,7 +3,7 @@ Contributors: magicoli69,nilsnolde,danilopinotti
 Donate link: http://magiiic.com/support/documents-from-git
 Tags: markdown,jupyter,notebook,github,bitbucket,gitlab,vcs
 Requires at least: 5.0.0
-Tested up to : 6.7.1
+Tested up to: 6.7.1
 Requires PHP: 5.7
 Stable tag: 2.2.0
 License : AGPL-3.0-or-later
@@ -289,24 +289,24 @@ If you encounter this message instead of seeing your rendered Markdown file, you
 
 == Changelog ==
 
-= v2.2.0 =
+= 2.2.0 =
 * Plugin didn't authenticate correctly to GitHub
 
-= v2.1.0 =
+= 2.1.0 =
 * Styles were not enqueued properly which led to default markdown rendering
 
-= v2.0.0 =
+= 2.0.0 =
 * Created Settings subpage for the plugin (BREAKING CHANGE)
 
-= v1.1.1 =
+= 1.1.1 =
 * Fix GitLab URLs for subdirectory markdown paths
 
-= v1.1.0 =
+= 1.1.0 =
 * Implement static caching
 
-= v1.0.2 =
+= 1.0.2 =
 * Fixed rate limiting for unauthenticated `/markdown` requests
 * Fixed Jupyter implementation
 
-= v1.0.0 =
+= 1.0.0 =
 * First version

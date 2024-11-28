@@ -1,7 +1,7 @@
 {
   "name": "documents-from-git",
   "description": "Render and cache various document formats in any post or page directly from a remote Git repository.",
-  "version": "2.2.0",
+  "version": "2.3.0-dev",
   "main": "webpack.config.js",
   "repository": {
     "type": "git",
