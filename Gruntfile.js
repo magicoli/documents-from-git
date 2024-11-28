@@ -3,7 +3,7 @@ const fs   = require( 'fs' );
 const path = require( 'path' );
 
 const PROJECT_NAME = 'documents-from-git';
-const MAIN_FILE = 'documents-git.php';
+const MAIN_FILE    = 'documents-git.php';
 
 module.exports = function ( grunt ) {
 
@@ -99,83 +99,83 @@ module.exports = function ( grunt ) {
 						to: function (matchedWord) {
 							const content = grunt.file.read( MAIN_FILE );
 							const match   = content.match( /Plugin Name: (.*)/ );
-							return match ? `Plugin Name: ${match[1]}` : matchedWord;
+							return match ? `Plugin Name : ${match[1]}` : matchedWord;
 						}
 					}, {
 						from: /Plugin URI: .*/g,
 						to: function (matchedWord) {
 							const content = grunt.file.read( MAIN_FILE );
 							const match   = content.match( /Plugin URI: (.*)/ );
-							return match ? `Plugin URI: ${match[1]}` : matchedWord;
+							return match ? `Plugin URI : ${match[1]}` : matchedWord;
 						}
 					}, {
 						from: /Description: .*/g,
 						to: function (matchedWord) {
 							const content = grunt.file.read( MAIN_FILE );
 							const match   = content.match( /Description: (.*)/ );
-							return match ? `Description: ${match[1]}` : matchedWord;
+							return match ? `Description : ${match[1]}` : matchedWord;
 						}
 					}, {
 						from: /Version: .*/g,
 						to: function (matchedWord) {
 							const content = grunt.file.read( MAIN_FILE );
 							const match   = content.match( /Version: (.*)/ );
-							return match ? `Version: ${match[1]}` : matchedWord;
+							return match ? `Version : ${match[1]}` : matchedWord;
 						}
 					}, {
 						from: /Author: .*/g,
 						to: function (matchedWord) {
 							const content = grunt.file.read( MAIN_FILE );
 							const match   = content.match( /Author: (.*)/ );
-							return match ? `Author: ${match[1]}` : matchedWord;
+							return match ? `Author : ${match[1]}` : matchedWord;
 						}
 					}, {
 						from: /Author URI: .*/g,
 						to: function (matchedWord) {
 							const content = grunt.file.read( MAIN_FILE );
 							const match   = content.match( /Author URI: (.*)/ );
-							return match ? `Author URI: ${match[1]}` : matchedWord;
+							return match ? `Author URI : ${match[1]}` : matchedWord;
 						}
 					}, {
 						from: /License: .*/g,
 						to: function (matchedWord) {
 							const content = grunt.file.read( MAIN_FILE );
 							const match   = content.match( /License: (.*)/ );
-							return match ? `License: ${match[1]}` : matchedWord;
+							return match ? `License : ${match[1]}` : matchedWord;
 						}
 					}, {
 						from: /License URI: .*/g,
 						to: function (matchedWord) {
 							const content = grunt.file.read( MAIN_FILE );
 							const match   = content.match( /License URI: (.*)/ );
-							return match ? `License URI: ${match[1]}` : matchedWord;
+							return match ? `License URI : ${match[1]}` : matchedWord;
 						}
 					}, {
 						from: /Requires at least: .*/g,
 						to: function (matchedWord) {
 							const content = grunt.file.read( MAIN_FILE );
 							const match   = content.match( /Requires at least: (.*)/ );
-							return match ? `Requires at least: ${match[1]}` : matchedWord;
+							return match ? `Requires at least : ${match[1]}` : matchedWord;
 						}
 					}, {
 						from: /Requires PHP: .*/g,
 						to: function (matchedWord) {
 							const content = grunt.file.read( MAIN_FILE );
 							const match   = content.match( /Requires PHP: (.*)/ );
-							return match ? `Requires PHP: ${match[1]}` : matchedWord;
+							return match ? `Requires PHP : ${match[1]}` : matchedWord;
 						}
 					}, {
 						from: /Tested up to: .*/g,
 						to: function (matchedWord) {
 							const version = getCurrentWordPressVersion();
-							return version ? `Tested up to: ${version}` : matchedWord;
+							return version ? `Tested up to : ${version}` : matchedWord;
 						}
 					}, {
 						from: /^\n\n*(.*)\n*\n==/gm,
 						to: function (match, p1) {
 							const content          = grunt.file.read( MAIN_FILE );
 							const descriptionMatch = content.match( /Description: (.*)/ );
-							return descriptionMatch ? `\n${descriptionMatch[1]}\n\n==` : `\n${p1}\n\n==`;
+							return descriptionMatch ? `\n${descriptionMatch[1]}\n\n == ` : `\n${p1}\n\n == `;
 						}
 					}]
 				},
