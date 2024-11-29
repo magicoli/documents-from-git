@@ -14,4 +14,3 @@ node_modules/
 *.sql
 *.tar.gz
 *.zip
-src/

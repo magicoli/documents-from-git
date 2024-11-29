@@ -1,5 +1,9 @@
 ## Changelog
 
+### 2.3.0
+* fix multiple "Undefined array key" log warnings occurring since php7 or 8
+* [Dev Breaking Change] Moved WordPress plugin files from the `document-git/` subfolder to the root folder to follow best practices. This change improves maintainability but may cause issues when comparing files before and after this commit. Note: This does not affect end users.
+
 ### 2.2.0
 * Plugin didn't authenticate correctly to GitHub
 

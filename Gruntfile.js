@@ -175,7 +175,7 @@ module.exports = function ( grunt ) {
 						to: function (match, p1) {
 							const content          = grunt.file.read( MAIN_FILE );
 							const descriptionMatch = content.match( /Description: (.*)/ );
-							return descriptionMatch ? `\n${descriptionMatch[1]}\n\n == ` : `\n${p1}\n\n == `;
+							return descriptionMatch ? `\n${descriptionMatch[1]}\n\n==` : `\n${p1}\n\n==`;
 						}
 					}]
 				},

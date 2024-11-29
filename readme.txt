@@ -5,13 +5,13 @@ Tags: markdown,jupyter,notebook,github,bitbucket,gitlab,vcs
 Requires at least: 5.0.0
 Tested up to: 6.7.1
 Requires PHP: 5.7
-Stable tag: 2.2.0
+Stable tag: 2.3.1
 License : AGPL-3.0-or-later
 License URI : https://www.gnu.org/licenses/agpl-3.0.html
 
 Render and cache various document formats in any post or page directly from a remote Git repository.
 
- ==  Description ==
+== Description ==
 
 This WordPress Plugin lets you easily publish, collaborate on and version control your \[**Markdown, Jupyter notebook**\] documents directly from your favorite remote Git platform, **even if it's self-hosted**.
 
@@ -288,6 +288,10 @@ If you encounter this message instead of seeing your rendered Markdown file, you
 
 
 == Changelog ==
+
+= 2.3.0 =
+* fix multiple "Undefined array key" log warnings occurring since php7 or 8
+* [Dev Breaking Change] Moved WordPress plugin files from the `document-git/` subfolder to the root folder to follow best practices. This change improves maintainability but may cause issues when comparing files before and after this commit. Note: This does not affect end users.
 
 = 2.2.0 =
 * Plugin didn't authenticate correctly to GitHub

@@ -1,0 +1,107 @@
+#!/bin/bash
+
+PGM=$(basename $0)
+TMP=/tmp/$PGM.$$
+
+trap "rm -f $TMP.*" EXIT
+
+# Check if there are uncommitted changes
+if [ -n "$(git status --porcelain)" ]
+then
+    echo "There are uncommitted changes. Please commit or stash them before running this script." >&2
+    echo >&2
+    git status >&2
+    exit 1
+fi
+
+# version_pattern="(v|apk )[0-9]\+\.[0-9]\+\.[0-9]\+"
+# version_pattern="v?[0-9]\+\.[0-9]\+\.[0-9]\+"
+version_pattern="[0-9]+(\.[0-9]+)+"
+commit_hash_pattern="[0-9a-f]{40}"
+
+git log --pretty="%H %B" | egrep --color "$commit_hash_pattern v?$version_pattern" > $TMP.hashes
+cut -d " " -f 2 $TMP.hashes | sed "s/^v//" > $TMP.commit.versions
+last_version=$(head -1 $TMP.commit.versions)
+# last_version_hash=$(head -1 $TMP.hashes | cut -d " " -f 1)
+cat CHANGELOG.md | egrep "^(### )?v?[0-9]+(\.[0-9]+)+" | sed -E -e "s/^(### )?//" -e "s/^v//" | cut -d " " -f 1 > $TMP.log.versions
+last_logged_version=$(grep -Fxf $TMP.log.versions $TMP.commit.versions | head -n 1)
+if [ "$last_logged_version" = "" -o "$last_logged_version" = "" ]
+then
+    echo "Last version: $last_version" >&2
+    echo "Last logged version: $last_logged_version" >&2
+    echo "Current version last logged version not found" >&2
+    exit 1
+fi
+
+[ -z "$last_logged_version" ] && look_version=$last_version || look_version=$last_logged_version
+[ -z "$last_logged_version" ] && look_version=$last_version_hash || look_version=$last_logged_version
+look_hash=$(egrep " v?$look_version" $TMP.hashes | cut -d " " -f 1)
+
+egrep -A99999 "^### v?$look_version" CHANGELOG.md > $TMP.oldchangelog
+
+if [ "$1" = "bump-version" -o "$1" = "bump" -o "$1" = "-b" ]
+then
+    shift
+    composer -n bump-version $@ >&2 || exit $?
+    ver=$(cat .version)
+else
+    ver="Unreleased changes"
+fi
+
+echo "## Changelog" > $TMP.changelog
+
+# git log $look_hash..HEAD --pretty=format:"%B" | grep -v "^\s*$"
+# git log --pretty=%B --author-date-order --all --reverse --after="$(git show -s --format='%at' $look_hash)" \
+# The long complicate command is need to actually get the right selection of commits in the right order
+git log --pretty=%H | grep -B999 $look_hash | grep -v $look_hash \
+| while read hash; do git log -n1 --pretty=%B $hash; done \
+| grep . | egrep "^v?$version_pattern|^ *\* " | sed -E -e "s/^v?($version_pattern)/\n### \\1/" > $TMP.changes
+
+grep -q "." $TMP.changes \
+&& echo >> $TMP.changelog \
+&& echo "### $ver" >> $TMP.commit \
+&& cat $TMP.changes >> $TMP.commit
+
+# grep "^\* new " $TMP.changes | tee -a  $TMP.commit
+# egrep "^\* add(ed)? " $TMP.changes | tee -a  $TMP.commit
+# egrep "^\* fix(ed)? " $TMP.changes | tee -a  $TMP.commit
+# egrep -v "^\* (new|add(ed)?|fix(ed)?) " $TMP.changes | tee -a  $TMP.commit
+
+cat $TMP.commit | while read line
+do
+    grep -q "^$line$" $TMP.commit.tmp 2>/dev/null || echo "$line" | egrep -vi "updated? changelog" >> $TMP.commit.tmp
+done
+mv $TMP.commit.tmp $TMP.commit
+
+cat $TMP.commit | sed -e "s/\* \*/  -/" >> $TMP.changelog
+
+# # git commits starting with $version_pattern
+# git log --pretty=oneline | grep " $version_pattern" | cut -d " " -f 1 \
+# | while read commit_hash; do
+#     echo >> $TMP.changelog
+#     git log $commit_hash^..$commit_hash --pretty=format:"%B" | sed "s/^v\([0-9]\)/\\1/" >> $TMP.changelog
+# done
+
+grep -q . $TMP.oldchangelog \
+&& echo >> $TMP.changelog \
+&& cat $TMP.oldchangelog >> $TMP.changelog
+
+mv $TMP.changelog CHANGELOG.md
+
+# grunt readme
+
+git diff
+# diff CHANGELOG.md $TMP.changelog
+echo
+
+if [ "$ver" != "Unreleased changes" ]
+then
+    read -p "Do you want to commit these changes? [y/N] " -n 1 -r
+    if [[ $REPLY =~ ^[Yy]$ ]]
+    then
+        git add -A
+        sed "s/^$ver/v$ver/" $TMP.commit | git commit -F -
+    else
+        echo "Aborted"
+    fi
+fi
